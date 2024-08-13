@@ -14,16 +14,18 @@ then
   echo -e "\nWelcome, $USERNAME! It looks like this is your first time here.\n"
   INSERT_USERNAME=$($PSQL "INSERT INTO users(username) VALUES ('$USERNAME')")
 else
-  # get username data
+  # get username/best game data & remove unecessary spaces
   GAMES_PLAYED=$($PSQL "SELECT COUNT(*) FROM games INNER JOIN users USING(user_id) WHERE username ='$USERNAME'")
+  GAMES_PLAYED_FORMATTED=$(echo $GAMES_PLAYED | sed 's/^ *//;s/ *$//')
+
   BEST_GAME=$($PSQL "SELECT MIN(guesses) FROM games INNER JOIN users USING(user_id) WHERE username ='$USERNAME'")
-  echo -e "\nWelcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses.\n"
+  BEST_GAME_FORMATTED=$(echo $BEST_GAME | sed 's/^ *//;s/ *$//')
+  echo -e "\nWelcome back, $USERNAME! You have played $GAMES_PLAYED_FORMATTED games, and your best game took $BEST_GAME_FORMATTED guesses.\n"
 
 fi
 
 # generate random number between 1 and 1000
 SECRET_NUMBER=$(( $RANDOM % 1000 + 1 ))
-echo $SECRET_NUMBER
 
 # variable to store number of guesses/tries
 TRIES=0
@@ -58,3 +60,4 @@ do
     break
   fi
 done
+
